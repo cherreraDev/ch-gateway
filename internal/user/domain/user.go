@@ -6,17 +6,17 @@ import (
 )
 
 type User struct {
-	Id       uuid.UUID `json:"id"`
-	UserName string    `json:"user_name"`
-	Password string    `json:"password"`
+	id       uuid.UUID
+	userName string
+	password string
 }
 
 func (u *User) EncryptPassword() error {
-	hasedPassword, err := hashPassword(u.Password)
+	hasedPassword, err := hashPassword(u.password)
 	if err != nil {
 		return err
 	}
-	u.Password = hasedPassword
+	u.password = hasedPassword
 	return nil
 }
 
@@ -25,7 +25,7 @@ func (u *User) CheckPassword(password string) error {
 	if err != nil {
 		return err
 	}
-	if hasedPassword != u.Password {
+	if hasedPassword != u.password {
 		return ErrIncorrectPassword
 	}
 	return nil
@@ -37,4 +37,24 @@ func hashPassword(password string) (string, error) {
 		return "", err
 	}
 	return string(hashedBytes), nil
+}
+
+func (u *User) Id() uuid.UUID {
+	return u.id
+}
+func (u *User) UserName() string {
+	return u.userName
+}
+func (u *User) Password() string {
+	return u.password
+}
+
+func (u *User) SetId(id uuid.UUID) {
+	u.id = id
+}
+func (u *User) SetUserName(userName string) {
+	u.userName = userName
+}
+func (u *User) SetPassword(password string) {
+	u.password = password
 }

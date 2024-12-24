@@ -1,10 +1,44 @@
 package dependencycontainer
 
-import "gorm.io/gorm"
+import (
+	"ch-gateway/internal/user/domain"
+	"ch-gateway/internal/user/platform/storage/repositories"
+	loginservices "ch-gateway/internal/user/service/loginServices"
 
-type Container struct {
+	"gorm.io/gorm"
+)
+
+type Repositories struct {
+	UserRepository domain.UserRepository
 }
 
-func NewContainer(db *gorm.DB) Container {
-	return Container{}
+type Services struct {
+	LoginService domain.LoginService
+}
+
+type Container struct {
+	Repositories Repositories
+	Services     Services
+}
+
+func NewRepositories(db *gorm.DB) Repositories {
+	return Repositories{
+		UserRepository: repositories.NewGormUserRepository(db),
+	}
+}
+
+func NewServices(repos Repositories, signingKey string) Services {
+	return Services{
+		LoginService: loginservices.NewUserPasswordLoginService(repos.UserRepository, signingKey),
+	}
+}
+
+func NewContainer(db *gorm.DB, signingKey string) Container {
+	repos := NewRepositories(db)
+	services := NewServices(repos, signingKey)
+
+	return Container{
+		Repositories: repos,
+		Services:     services,
+	}
 }

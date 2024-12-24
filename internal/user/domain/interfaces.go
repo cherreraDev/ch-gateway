@@ -3,7 +3,7 @@ package domain
 import "github.com/google/uuid"
 
 type LoginService interface {
-	Authenticate(credentials ...string) (AuthResponse, error)
+	Authenticate(credentials map[string]string) (AuthResponse, error)
 }
 
 type AuthResponse struct {
