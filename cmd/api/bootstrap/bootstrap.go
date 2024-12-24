@@ -45,4 +45,5 @@ type config struct {
 	DbPort     uint          `envconfig:"DB_PORT" default:"3306"`
 	DbName     string        `envconfig:"DB_NAME" default:"mydb"`
 	DbTimeOut  time.Duration `envconfig:"DB_TIMEOUT" default:"10s"`
+	SecretKey  string        `envconfig:"SECRET_KEY" default:"secretos123"`
 }
