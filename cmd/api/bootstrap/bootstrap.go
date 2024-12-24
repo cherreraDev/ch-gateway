@@ -1,14 +1,16 @@
 package bootstrap
 
 import (
+	dependencycontainer "ch-gateway/internal/shared/dependencyContainer"
 	"ch-gateway/internal/shared/platform/server"
 	"context"
-	"database/sql"
 	"fmt"
 	"time"
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/kelseyhightower/envconfig"
+	"gorm.io/driver/mysql"
+	"gorm.io/gorm"
 )
 
 func Run() error {
@@ -18,19 +20,19 @@ func Run() error {
 		return err
 	}
 
-	// Change according to the database to be used
 	dbURI := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s", conf.DbUsername, conf.DbPassword, conf.DbHost, conf.DbPort, conf.DbName)
 
-	db, err := sql.Open("mysql", dbURI)
+	db, err := gorm.Open(mysql.Open(dbURI))
 	if err != nil {
 		return err
 	}
-	if err := db.Ping(); err != nil {
+	sqlDB, _ := db.DB()
+	if err := sqlDB.Ping(); err != nil {
 		return fmt.Errorf("failed to connect to the database: %w", err)
 	}
-
+	container := dependencycontainer.NewContainer(db)
 	ctx, srv := server.NewServer(context.Background(), conf.Host, conf.Port, conf.ShutdownTimeout)
-	return srv.Run(ctx)
+	return srv.Run(ctx, container)
 }
 
 type config struct {

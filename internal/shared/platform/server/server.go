@@ -1,6 +1,7 @@
 package server
 
 import (
+	dependencycontainer "ch-gateway/internal/shared/dependencyContainer"
 	"context"
 	"fmt"
 	"log"
@@ -24,17 +25,17 @@ func NewServer(ctx context.Context, host string, port string, shutdownTimeout ti
 		httpAddr:        fmt.Sprintf("%s:%s", host, port),
 		shutdownTimeout: shutdownTimeout,
 	}
-	srv.registerRoutes()
 	return serverContext(ctx), srv
 }
 
-func (s *Server) Run(ctx context.Context) error {
+func (s *Server) Run(ctx context.Context, container dependencycontainer.Container) error {
 	log.Println("server running on", s.httpAddr)
 
 	srv := &http.Server{
 		Addr:    s.httpAddr,
 		Handler: s.engine,
 	}
+	registerRoutes(s, container)
 
 	go func() {
 		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
@@ -47,14 +48,6 @@ func (s *Server) Run(ctx context.Context) error {
 	defer cancel()
 
 	return srv.Shutdown(ctxShutDown)
-}
-
-func (s *Server) registerRoutes() {
-	s.engine.GET("/ping", func(c *gin.Context) {
-		c.JSON(200, gin.H{
-			"message": "pong",
-		})
-	})
 }
 
 // Gracefully shutdown

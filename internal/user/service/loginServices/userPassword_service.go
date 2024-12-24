@@ -3,12 +3,19 @@ package loginservices
 import "ch-gateway/internal/user/domain"
 
 type UserPasswordLoginService struct {
-	Repository domain.UserRepository
-	SigningKey string
+	repository domain.UserRepository
+	signingKey string
+}
+
+func NewUserPasswordLoginService(repository domain.UserRepository, signingKey string) UserPasswordLoginService {
+	return UserPasswordLoginService{
+		repository: repository,
+		signingKey: signingKey,
+	}
 }
 
 func (u UserPasswordLoginService) Authenticate(userName, password string) (domain.AuthResponse, error) {
-	user, err := u.Repository.FindUserByUserName(userName)
+	user, err := u.repository.FindUserByUserName(userName)
 	emptyAuth := domain.AuthResponse{}
 	if err != nil {
 		return emptyAuth, err
@@ -17,7 +24,7 @@ func (u UserPasswordLoginService) Authenticate(userName, password string) (domai
 	if err != nil {
 		return emptyAuth, err
 	}
-	token, err := GenerateToken(user.Id, u.SigningKey)
+	token, err := GenerateToken(user.Id, u.signingKey)
 	if err != nil {
 		return emptyAuth, err
 	}
