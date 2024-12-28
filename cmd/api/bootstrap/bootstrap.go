@@ -30,7 +30,7 @@ func Run() error {
 	if err := sqlDB.Ping(); err != nil {
 		return fmt.Errorf("failed to connect to the database: %w", err)
 	}
-	container := dependencycontainer.NewContainer(db)
+	container := dependencycontainer.NewContainer(db, conf.SecretKey)
 	ctx, srv := server.NewServer(context.Background(), conf.Host, conf.Port, conf.ShutdownTimeout)
 	return srv.Run(ctx, container)
 }
