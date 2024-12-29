@@ -2,6 +2,7 @@ package server
 
 import (
 	dependencycontainer "ch-gateway/internal/shared/dependencyContainer"
+	userRoutes "ch-gateway/internal/user/platform/server/routes"
 
 	"github.com/gin-gonic/gin"
 )
@@ -12,4 +13,5 @@ func registerRoutes(s *Server, container dependencycontainer.Container) {
 			"message": "pong",
 		})
 	})
+	userRoutes.SetUp(s.engine, container)
 }
