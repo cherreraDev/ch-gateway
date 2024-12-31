@@ -21,7 +21,7 @@ func GenerateToken(userId uuid.UUID, signingKey string) (string, error) {
 		},
 	})
 
-	tokenString, err := token.SignedString(signingKey)
+	tokenString, err := token.SignedString([]byte(signingKey))
 	if err != nil {
 		return "", err
 	}

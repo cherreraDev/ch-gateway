@@ -2,6 +2,7 @@ package crudservice
 
 import (
 	"ch-gateway/internal/user/domain"
+	"errors"
 
 	"github.com/google/uuid"
 )
@@ -24,14 +25,18 @@ func (us UserService) GetUserByUserName(userName string) (domain.User, error) {
 
 func (us UserService) CreateUser(id uuid.UUID, userName, password string) error {
 	user := domain.NewUserBuilder().WithId(id).WithUserName(userName).WithPassword(password).Build()
-	err := us.repository.SaveUser(user)
+	err := user.EncryptPassword()
+	if err != nil {
+		return err
+	}
+	err = us.repository.SaveUser(user)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func (us UserService) UpdateUser(userName, password string) error {
+func (us UserService) UpdateUser(id uuid.UUID, userName, password string) error {
 	userBuilder := domain.NewUserBuilder()
 	if userName != "" {
 		userBuilder.WithUserName(userName)
@@ -39,8 +44,16 @@ func (us UserService) UpdateUser(userName, password string) error {
 	if password != "" {
 		userBuilder.WithPassword(password)
 	}
+	if id == uuid.Nil {
+		return errors.New("invalid ID: ID cannot be nil")
+	}
+	userBuilder.WithId(id)
 	user := userBuilder.Build()
-	err := us.repository.UpdateUser(user)
+	err := user.EncryptPassword()
+	if err != nil {
+		return err
+	}
+	err = us.repository.UpdateUser(user)
 	if err != nil {
 		return err
 	}

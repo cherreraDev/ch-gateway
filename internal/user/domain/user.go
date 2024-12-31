@@ -21,14 +21,7 @@ func (u *User) EncryptPassword() error {
 }
 
 func (u *User) CheckPassword(password string) error {
-	hasedPassword, err := hashPassword(password)
-	if err != nil {
-		return err
-	}
-	if hasedPassword != u.password {
-		return ErrIncorrectPassword
-	}
-	return nil
+	return bcrypt.CompareHashAndPassword([]byte(u.password), []byte(password))
 }
 
 func hashPassword(password string) (string, error) {

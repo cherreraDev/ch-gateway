@@ -13,6 +13,10 @@ type UserModel struct {
 	Password string    `gorm:"type:varchar(255);not null" `
 }
 
+func (UserModel) TableName() string {
+	return "users"
+}
+
 func (u *UserModel) BeforeCreate(tx *gorm.DB) (err error) {
 	if u.ID == uuid.Nil {
 		u.ID = uuid.New()

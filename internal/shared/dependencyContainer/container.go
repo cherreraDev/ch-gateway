@@ -36,11 +36,11 @@ func NewServices(repos Repositories, signingKey string) Services {
 	}
 }
 
-func NewContainer(db *gorm.DB, signingKey string) *Container {
+func NewContainer(db *gorm.DB, signingKey string) Container {
 	repos := NewRepositories(db)
 	services := NewServices(repos, signingKey)
 
-	return &Container{
+	return Container{
 		Repositories: repos,
 		Services:     services,
 	}

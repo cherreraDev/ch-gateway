@@ -4,6 +4,7 @@ import (
 	"ch-gateway/internal/user/domain"
 	"ch-gateway/internal/user/platform/storage/model"
 	"errors"
+	"log"
 
 	"github.com/google/uuid"
 	"gorm.io/gorm"
@@ -14,6 +15,12 @@ type GormUserRepository struct {
 }
 
 func NewGormUserRepository(db *gorm.DB) GormUserRepository {
+	if err := db.AutoMigrate(&model.UserModel{}); err != nil {
+		log.Fatalf("error migrating model: %v", err)
+	}
+
+	log.Println("Migrations completed successfully")
+
 	return GormUserRepository{db: db}
 }
 

@@ -7,6 +7,10 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func SetUp(engine *gin.Engine, container *dependencycontainer.Container) {
-	engine.POST("/login", handlers.LoginHandler(container.Services.LoginService))
+func SetUp(engine *gin.Engine, container dependencycontainer.Container) {
+	userGroup := engine.Group("/api/v1/user")
+	{
+		userGroup.POST("/login", handlers.LoginHandler(container.Services.LoginService))
+		userGroup.POST("/new", handlers.CreateUserHandler(container.Services.UserService))
+	}
 }
