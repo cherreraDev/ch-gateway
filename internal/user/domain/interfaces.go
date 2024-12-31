@@ -18,3 +18,11 @@ type UserRepository interface {
 	UpdateUser(User) error
 	DeleteUser(userId uuid.UUID) error
 }
+
+type UserService interface {
+	GetUserById(userId uuid.UUID) (User, error)
+	GetUserByUserName(userName string) (User, error)
+	CreateUser(id uuid.UUID, userName, password string) error
+	UpdateUser(userName, password string) error
+	DeleteUser(userId uuid.UUID) error
+}

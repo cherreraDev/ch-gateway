@@ -7,6 +7,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func SetUp(engine *gin.Engine, container dependencycontainer.Container) {
+func SetUp(engine *gin.Engine, container *dependencycontainer.Container) {
 	engine.POST("/login", handlers.LoginHandler(container.Services.LoginService))
 }
