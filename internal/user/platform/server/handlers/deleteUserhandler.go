@@ -2,22 +2,22 @@ package handlers
 
 import (
 	"ch-gateway/internal/user/domain"
-	httprequests "ch-gateway/internal/user/platform/server/handlers/httpRequests"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 )
 
 func DeleteUserHandler(service domain.UserService) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		//ToDo  do it with query param
-		var req httprequests.DeleteUserRequest
+		idParam := ctx.DefaultQuery("id", "")
 
-		if err := ctx.ShouldBindJSON(&req); err != nil {
-			ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request body"})
+		parsedID, err := uuid.Parse(idParam)
+		if err != nil {
+			ctx.JSON(http.StatusBadRequest, gin.H{"error": "El parámetro 'id' debe ser un UUID válido"})
 			return
 		}
-		err := service.DeleteUser(req.Id)
+		err = service.DeleteUser(parsedID)
 
 		if err != nil {
 			ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Error deleting the user"})

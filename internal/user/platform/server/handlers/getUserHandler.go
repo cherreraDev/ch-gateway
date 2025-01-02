@@ -2,21 +2,23 @@ package handlers
 
 import (
 	"ch-gateway/internal/user/domain"
-	httprequests "ch-gateway/internal/user/platform/server/handlers/httpRequests"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 )
 
 func GetUserByIdHandler(service domain.UserService) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		//ToDo  do it with query param
-		var req httprequests.GetByIdRequest
-		if err := ctx.ShouldBindJSON(&req); err != nil {
-			ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request body"})
+		idParam := ctx.DefaultQuery("id", "")
+
+		parsedID, err := uuid.Parse(idParam)
+		if err != nil {
+			ctx.JSON(http.StatusBadRequest, gin.H{"error": "El parámetro 'id' debe ser un UUID válido"})
 			return
 		}
-		user, err := service.GetUserById(req.Id)
+
+		user, err := service.GetUserById(parsedID)
 		if err != nil {
 			ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Error finding the user"})
 			return
@@ -26,13 +28,8 @@ func GetUserByIdHandler(service domain.UserService) gin.HandlerFunc {
 }
 func GetUserByUserNameHandler(service domain.UserService) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		//ToDo  do it with query param
-		var req httprequests.GetByUserNameRequest
-		if err := ctx.ShouldBindJSON(&req); err != nil {
-			ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request body"})
-			return
-		}
-		user, err := service.GetUserByUserName(req.UserName)
+		userNameParam := ctx.DefaultQuery("userName", "")
+		user, err := service.GetUserByUserName(userNameParam)
 		if err != nil {
 			ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Error finding the user"})
 			return

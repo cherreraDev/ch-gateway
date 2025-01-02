@@ -12,5 +12,9 @@ func SetUp(engine *gin.Engine, container dependencycontainer.Container) {
 	{
 		userGroup.POST("/login", handlers.LoginHandler(container.Services.LoginService))
 		userGroup.POST("/new", handlers.CreateUserHandler(container.Services.UserService))
+		userGroup.GET("/:id", handlers.GetUserByIdHandler(container.Services.UserService))
+		userGroup.GET("/name/:userName", handlers.GetUserByUserNameHandler(container.Services.UserService))
+		userGroup.PUT("/:id", handlers.UpdateUserHandler(container.Services.UserService))
+		userGroup.DELETE("/:id", handlers.DeleteUserHandler(container.Services.UserService))
 	}
 }
