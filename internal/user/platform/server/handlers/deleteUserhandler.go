@@ -14,7 +14,7 @@ func DeleteUserHandler(service domain.UserService) gin.HandlerFunc {
 
 		parsedID, err := uuid.Parse(idParam)
 		if err != nil {
-			ctx.JSON(http.StatusBadRequest, gin.H{"error": "El parámetro 'id' debe ser un UUID válido"})
+			ctx.JSON(http.StatusBadRequest, gin.H{"error": "id param 'id' should be a valid UUID"})
 			return
 		}
 		err = service.DeleteUser(parsedID)

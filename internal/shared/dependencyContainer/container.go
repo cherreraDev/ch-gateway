@@ -44,6 +44,6 @@ func NewContainer(db *gorm.DB, signingKey string) Container {
 	return Container{
 		Repositories: repos,
 		Services:     services,
-		signingKey:   signingKey,
+		SigningKey:   signingKey,
 	}
 }
