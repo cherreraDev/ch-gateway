@@ -21,6 +21,7 @@ type Services struct {
 type Container struct {
 	Repositories Repositories
 	Services     Services
+	SigningKey   string
 }
 
 func NewRepositories(db *gorm.DB) Repositories {
@@ -43,5 +44,6 @@ func NewContainer(db *gorm.DB, signingKey string) Container {
 	return Container{
 		Repositories: repos,
 		Services:     services,
+		signingKey:   signingKey,
 	}
 }
