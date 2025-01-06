@@ -1,6 +1,7 @@
 package dependencycontainer
 
 import (
+	"ch-gateway/internal/shared/domain/discovery"
 	"ch-gateway/internal/user/domain"
 	"ch-gateway/internal/user/platform/storage/repositories"
 	crudservice "ch-gateway/internal/user/service/crudService"
@@ -14,8 +15,9 @@ type Repositories struct {
 }
 
 type Services struct {
-	LoginService domain.LoginService
-	UserService  domain.UserService
+	LoginService     domain.LoginService
+	UserService      domain.UserService
+	DiscoveryService discovery.DiscoveryServer
 }
 
 type Container struct {
