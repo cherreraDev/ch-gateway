@@ -1,7 +1,9 @@
 package dependencycontainer
 
 import (
+	"ch-gateway/cmd/api/bootstrap/config"
 	"ch-gateway/internal/shared/domain/discovery"
+	"ch-gateway/internal/shared/service"
 	"ch-gateway/internal/user/domain"
 	"ch-gateway/internal/user/platform/storage/repositories"
 	crudservice "ch-gateway/internal/user/service/crudService"
@@ -32,20 +34,44 @@ func NewRepositories(db *gorm.DB) Repositories {
 	}
 }
 
-func NewServices(repos Repositories, signingKey string) Services {
-	return Services{
-		LoginService: loginservices.NewUserPasswordLoginService(repos.UserRepository, signingKey),
-		UserService:  crudservice.NewUserService(repos.UserRepository),
+func NewServices(repos Repositories) (Services, error) {
+	dicoveryServer, err := loadDiscoveryServer()
+	if err != nil {
+		return Services{}, err
 	}
+	return Services{
+		LoginService:     loginservices.NewUserPasswordLoginService(repos.UserRepository, config.GlobalConfig.SecretKey),
+		UserService:      crudservice.NewUserService(repos.UserRepository),
+		DiscoveryService: dicoveryServer,
+	}, nil
 }
 
-func NewContainer(db *gorm.DB, signingKey string) Container {
+func NewContainer(db *gorm.DB) (Container, error) {
 	repos := NewRepositories(db)
-	services := NewServices(repos, signingKey)
+	services, err := NewServices(repos)
+	if err != nil {
+		return Container{}, err
+	}
 
 	return Container{
 		Repositories: repos,
 		Services:     services,
-		SigningKey:   signingKey,
+		SigningKey:   config.GlobalConfig.SecretKey,
+	}, nil
+}
+
+func loadDiscoveryServer() (discovery.DiscoveryServer, error) {
+	var discoveryServer discovery.DiscoveryServer
+	var err error = nil
+	switch config.GlobalConfig.Environment {
+	case "dev":
+		discoveryServer = service.NewLocalDiscovery()
+	case "pre":
+		//ConsulServer sertup
+		discoveryServer, err = service.NewConsulService(config.GlobalConfig.ConsulAdress, config.GlobalConfig.ConsulPort)
+	default:
+		discoveryServer = service.NewLocalDiscovery()
 	}
+	return discoveryServer, err
+
 }

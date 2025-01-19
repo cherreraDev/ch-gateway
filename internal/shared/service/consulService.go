@@ -25,6 +25,7 @@ func NewConsulService(address, port string) (ConsulService, error) {
 	for i := 0; i < maxRetries; i++ {
 		consulClient, err = api.NewClient(consulConfig)
 		if err == nil {
+			fmt.Println("success connecting consul server")
 			return ConsulService{
 				Client: consulClient,
 			}, nil
